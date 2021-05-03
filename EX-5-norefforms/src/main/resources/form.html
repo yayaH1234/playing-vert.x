@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<form  onsubmit="return false">
+  <input id="fName" type="text" name="fName" value="">
+  <input type="submit" name="Submit" value="Submit" onclick="req()">
+</form>
+<p id="result" ></p>
+</body>
+<script type="text/javascript">
+
+  function req(){
+    var vl=document.getElementById("fName").value;
+    const Http = new XMLHttpRequest();
+    const url='http://localhost:8880/postsend';
+    Http.open("POST", url);
+
+    // create a JSON object
+    const json = {
+      "fname": vl
+    };
+
+
+// set `Content-Type` header
+    Http.setRequestHeader('Content-Type', 'application/json');
+
+// send rquest with JSON payload
+    Http.send(JSON.stringify(json));
+
+
+
+    Http.onload = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById("result").innerHTML=this.response;
+        console.log(this.response);
+      }}
+  }
+</script>
+</html>
