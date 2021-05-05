@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Res</title>
+</head>
+<body>
+<h1> my Res :  </h1>
+<p id="myvl"></p>
+</body>
+<script type="text/javascript">
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  var rsvl=urlParams.get("keyname");
+  console.log(rsvl);
+  document.getElementById("myvl").innerHTML=rsvl;
+</script>
+</html>

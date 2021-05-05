@@ -17,7 +17,78 @@ import io.vertx.ext.mongo.MongoClient;
 
 
 public class MainVerticle extends AbstractVerticle {
-final Logger logger= LoggerFactory.getLogger(MainVerticle.class);
+  final Logger logger = LoggerFactory.getLogger(MainVerticle.class);
+  MongoClient client;
+
+
+  private void syncinsert(String[] csvarray, int i2) {
+    logger.info("splite 2");
+
+    if (i2 < csvarray.length-4) {
+      try {
+        JsonObject document = new JsonObject().put("name", csvarray[i2])
+          .put("Email", csvarray[i2 + 1])
+          .put("PhoneNumber", csvarray[i2 + 2])
+          .put("Adress", csvarray[i2 + 3]);
+        client.save("csvfile", document, res -> {
+          if (res.succeeded()) {
+            //      logger.info("cool 47");
+            String id = res.result();
+            System.out.println("Saved book  " + id);
+            int lmd = i2 + 1;
+            syncinsert(csvarray, lmd);
+
+          }else {
+            logger.info("53");
+            res.cause().printStackTrace();
+
+          }
+
+        });
+      } catch (Exception e) {
+        logger.error("Failed  {} ", e);
+
+      }
+
+    }
+  }
+
+/*
+
+    private boolean syncinsert(String[] csvarray, int iter) {
+
+
+    logger.info("splite 2");
+    int i2 = 3;
+    if (i2 < csvarray.length) {
+
+      try {
+        //String name=csvarray[finalI].toString();
+        JsonObject document = new JsonObject().put("name", csvarray[i2])
+          .put("Email", csvarray[i2 + 1])
+          .put("PhoneNumber", csvarray[i2 + 2])
+          .put("Adress", csvarray[i2 + 3]);
+        client.insert("csvfile", document, res -> {
+          if (res.succeeded()) {
+            //      logger.info("cool 47");
+            String id = res.result();
+            System.out.println("Saved book  " + id);
+            int lmd = i2 + 1;
+            syncinsert(csvarray, lmd);
+
+          } else {
+            logger.info("53");
+            res.cause().printStackTrace();
+
+          }
+        });
+      } catch (Exception e) {
+        logger.error("Failed  {} ", e);
+
+      }
+    }
+  }*/
+
 
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
@@ -26,7 +97,7 @@ final Logger logger= LoggerFactory.getLogger(MainVerticle.class);
     JsonObject config = new JsonObject()
       .put("connection_string", "mongodb://localhost:27017")
       .put("db_name", "testcsv");
-    MongoClient client = MongoClient.create(vertx, config);
+     client = MongoClient.create(vertx, config);
 
     FileSystem fs = vertx.fileSystem();
     fs.readFile("testcsv.csv",ar ->{
@@ -34,56 +105,12 @@ final Logger logger= LoggerFactory.getLogger(MainVerticle.class);
         ar.cause().getMessage();
       }else {
         logger.info(ar.result());
+
         String[] csvarray = ar.result().toString().split(",");
+        syncinsert(csvarray,3);
+        Promise v1=Promise.promise();
 
-
-        logger.info("splite 2");
-        for(int i2=3;i2<csvarray.length;i2++){
-
-
-
-
-
-
-        //logger.info("39 --> "+client);
-          int finalI = i2;
-          vertx.executeBlocking(future -> {
-      //    logger.info("41");
-          try {
-      //      logger.info("43");
-
-            String name=csvarray[finalI].toString();
-            JsonObject document = new JsonObject()
-              .put("name", name)
-              .put("Email", csvarray[finalI +1])
-              .put("PhoneNumber", csvarray[finalI +2])
-              .put("Adress", csvarray[finalI +3]);
-            client.insert("csvfile", document, res -> {
-           //   logger.info("45");
-              if (res.succeeded()) {
-          //      logger.info("cool 47");
-                String id = res.result();
-                System.out.println("Saved book  " + id);
-                 future.complete();
-              } else {
-                logger.info("53");
-                res.cause().printStackTrace();
-                   future.complete();
-              }
-            });
-
-
-
-          }catch(Exception e){
-            logger.error("Failed  {} ", e);
-            future.complete();
-          }
-
-          //future.complete();
-        },res ->{
-          System.out.println("okok");
-        });
-        }
+          logger.info("hey ------------------------------------>");
 
       }
     });

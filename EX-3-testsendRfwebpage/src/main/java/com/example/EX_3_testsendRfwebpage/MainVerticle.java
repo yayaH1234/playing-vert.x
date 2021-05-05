@@ -1,17 +1,21 @@
 package com.example.EX_3_testsendRfwebpage;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 
 
 public class MainVerticle extends AbstractVerticle {
 
+  final Logger log= LoggerFactory.getLogger(MainVerticle.class);
 
   public static void main(String[] args) {
 
@@ -60,31 +64,35 @@ public class MainVerticle extends AbstractVerticle {
       .putHeader("Content-Type", "text/html")
       .sendFile("forms.html"));
 
+    router.get("/result").handler(ctx -> { ctx
+      .response()
+      .putHeader("Content-Type", "text/html")
+      .sendFile("result.html");
+        String myvl=ctx.pathParam("keyname");
+        log.info("okok rs--> "+myvl);
+
+      }
+    );
+
     router
       .post("/myreq")
       .handler(ctx -> {
-        ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
-
+       // ctx.response().putHeader(HttpHeaders.CONTENT_TYPE, "text/plain");
+     //   ctx.request().setExpectMultipart(true);
 
        ctx.request().bodyHandler(body -> {
 
-         String[] bdv=body.toString().split("=");
 
+         String[] bdv=body.toString().split("=");
+          log.info("---> "+body);
          double i=Double.parseDouble(bdv[1]);
          try {
 
-
-
+          log.info("posted --> "+ i);
+          ctx.redirect("/result?keyname="+i*20);
     //       ctx.json(new JsonObject().put("res", i * 20));
-           ctx.response().putHeader("res",""+ i * 20)
-             .putHeader("Content-Type", "text/html").sendFile("forms.html");
 
-           /*
-           * response().putHeader("res",""+i*20).putHeader("content-type", "text/html").sendFile("forms.html",h -> {
-
-           });//
-           *
-           * */
+           
          }catch(Exception e){
            e.getMessage();
          }
