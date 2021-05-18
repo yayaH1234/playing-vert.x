@@ -92,13 +92,13 @@ public class MainVerticle extends AbstractVerticle {
           ctx.redirect("/result?keyname="+i*20);
     //       ctx.json(new JsonObject().put("res", i * 20));
 
-           
+
          }catch(Exception e){
            e.getMessage();
          }
        });
 
       });
-    server.requestHandler(router).listen(8888);
+    server.requestHandler(router).listen(8880);
   }
 }
